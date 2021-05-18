@@ -10,6 +10,7 @@
 
 import ecs100.*;
 
+import java.util.Arrays;
 import java.util.*;
 import java.io.*;
 import java.awt.Color;
@@ -65,6 +66,7 @@ public class BattleGame {
     public static final int SCORES_TOP = 20;
 
     int count = 0;
+    int playCount = 0;
 
     /**
      * CORE
@@ -77,15 +79,15 @@ public class BattleGame {
      */
     public void restart() {
         /*# YOUR CODE HERE */
-
+        playCount = 0;
         compScore = 0;
         playScore = 0;
+        remainingReplaces = 3;
         tableComputer.clear();
         tablePlayer.clear();
         hand = new Card[NUM_HAND];
-        Card.getShuffledDeck();
-        drawHandCards();
-        redraw();
+        deck = Card.getShuffledDeck();
+        pickupCard();
         this.redraw();
     }
 
@@ -99,27 +101,13 @@ public class BattleGame {
 
     public void pickupCard() {
         /*# YOUR CODE HERE */
-        count = 0;
-        for (Card e : hand) {
-            if ((deck != null) && (e == null)) {
-                int count2 = 0;
-                for (Card i : deck) {
-                    if (deck.get(count2) != null){
-                        e = deck.get(count);
-                        UI.println(e.getRank());
-                        UI.println(e.getSuit());
-                        count++;
-                        e.draw(HAND_LEFT + (count * CARD_SPACING), HAND_TOP);
-                    }
-
-                }
-
-
-
+        for (int i = 0; i < hand.length; i++) {
+            if ((hand[i] == null) && (!deck.isEmpty())) {
+                hand[i] = deck.get(0);
+                deck.remove(0);
             }
         }
-        count = 0;
-        // this.redraw();
+        this.redraw();
     }
 
     /**
@@ -135,10 +123,12 @@ public class BattleGame {
         /*# YOUR CODE HERE */
         count = 0;
         for (Card e : hand) {
-            e = deck.get(count);
-            e.draw(HAND_LEFT + (count * CARD_SPACING), HAND_TOP);
-            count++;
-
+            if (hand[count] == null) {
+                count++;
+            } else if (hand[count] != null) {
+                e.draw(HAND_LEFT + (count * CARD_SPACING), HAND_TOP);
+                count++;
+            }
         }
         count = 0;
     }
@@ -155,6 +145,17 @@ public class BattleGame {
     public void drawTableCards() {
         //draw the cards in the tableComputer and tablePlayer lists.
         /*# YOUR CODE HERE */
+        count = 0;
+        for (Card e : tableComputer) {
+            e.draw(TABLE_LEFT + (count * CARD_SPACING), TABLE_TOP_COMPUTER);
+            count++;
+        }
+        count = 0;
+        for (Card e : tablePlayer) {
+            e.draw(TABLE_LEFT + (count * CARD_SPACING), TABLE_TOP_PLAYER);
+            count++;
+        }
+        count = 0;
 
     }
 
@@ -170,8 +171,26 @@ public class BattleGame {
      */
     public void playBattle() {
         /*# YOUR CODE HERE */
-
+        if (hand[0] != null) {
+            tablePlayer.add(hand[0]);
+            hand[0] = null;
+            tableComputer.add(deck.get(0));
+            deck.remove(0);
+        }
+        if (tableComputer.get(playCount).getRank() < tablePlayer.get(playCount).getRank()) {
+            UI.println(tablePlayer.get(playCount).getRank());
+            UI.println(tableComputer.get(playCount).getRank());
+            playScore++;
+            playCount++;
+        } else if (tableComputer.get(playCount).getRank() > tablePlayer.get(playCount).getRank()) {
+            UI.println(tablePlayer.get(playCount).getRank());
+            UI.println(tableComputer.get(playCount).getRank());
+            compScore++;
+            playCount++;
+        }
+        this.redraw();
     }
+
 
     /**
      * COMPLETION
@@ -182,6 +201,13 @@ public class BattleGame {
     public void replaceCard() {
         if (remainingReplaces > 0) {
             /*# YOUR CODE HERE */
+            for (int i = 0; i < 5; i++) {
+                if (selectedPos == i) {
+                    hand[selectedPos] = deck.get(0);
+                    deck.remove(0);
+                    remainingReplaces--;
+                }
+            }
         }
         this.redraw();
     }
@@ -195,6 +221,8 @@ public class BattleGame {
      */
     public void moveLeft() {
         /*# YOUR CODE HERE */
+
+
 
         this.redraw();
     }
@@ -212,7 +240,8 @@ public class BattleGame {
             if (y >= HAND_TOP && y <= HAND_TOP + CARD_HEIGHT &&
                     x >= HAND_LEFT && x <= HAND_LEFT + NUM_HAND * CARD_SPACING) {
                 this.selectedPos = (int) ((x - HAND_LEFT) / CARD_SPACING);
-                //UI.clearText();UI.println("selected "+this.selectedPos);
+                UI.clearText();
+                UI.println("selected " + this.selectedPos);
                 this.redraw();
             }
         }
