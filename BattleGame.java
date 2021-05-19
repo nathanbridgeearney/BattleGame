@@ -178,15 +178,16 @@ public class BattleGame {
             deck.remove(0);
         }
         if (tableComputer.get(playCount).getRank() < tablePlayer.get(playCount).getRank()) {
-            UI.println(tablePlayer.get(playCount).getRank());
-            UI.println(tableComputer.get(playCount).getRank());
             playScore++;
             playCount++;
         } else if (tableComputer.get(playCount).getRank() > tablePlayer.get(playCount).getRank()) {
-            UI.println(tablePlayer.get(playCount).getRank());
-            UI.println(tableComputer.get(playCount).getRank());
             compScore++;
             playCount++;
+        } else if (tableComputer.get(playCount).getRank() == tablePlayer.get(playCount).getRank()) {
+            playCount++;
+        }
+        if ((playScore == 7) || (compScore == 7)) {
+            endGame();
         }
         this.redraw();
     }
@@ -221,14 +222,13 @@ public class BattleGame {
      */
     public void moveLeft() {
         /*# YOUR CODE HERE */
-        if(selectedPos>0){
-            Card tempCard = hand[selectedPos-1];
-            hand[selectedPos-1]=hand[selectedPos];
-            hand[selectedPos]=tempCard;
+        if (selectedPos > 0) {
+            Card tempCard = hand[selectedPos - 1];
+            hand[selectedPos - 1] = hand[selectedPos];
+            hand[selectedPos] = tempCard;
         }
         this.redraw();
     }
-
 
 
     /** ---------- The code below is already written for you ---------- **/
@@ -245,7 +245,7 @@ public class BattleGame {
                     x >= HAND_LEFT && x <= HAND_LEFT + NUM_HAND * CARD_SPACING) {
                 this.selectedPos = (int) ((x - HAND_LEFT) / CARD_SPACING);
                 UI.clearText();
-               // UI.println("selected " + this.selectedPos);
+                // UI.println("selected " + this.selectedPos);
                 this.redraw();
             }
         }
@@ -259,8 +259,10 @@ public class BattleGame {
         UI.setColor(Color.red);
         if (this.playScore > this.compScore) {
             UI.drawString("YOU WIN!!!", 500, HAND_TOP - 80);
+            playScore++;
         } else {
             UI.drawString("YOU LOSE", 500, HAND_TOP - 80);
+            compScore++;
         }
         UI.sleep(3000);
         this.restart();
