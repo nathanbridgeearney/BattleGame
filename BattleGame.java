@@ -221,11 +221,15 @@ public class BattleGame {
      */
     public void moveLeft() {
         /*# YOUR CODE HERE */
-
-
-
+        if(selectedPos>0){
+            Card tempCard = hand[selectedPos-1];
+            hand[selectedPos-1]=hand[selectedPos];
+            hand[selectedPos]=tempCard;
+        }
         this.redraw();
     }
+
+
 
     /** ---------- The code below is already written for you ---------- **/
 
@@ -241,7 +245,7 @@ public class BattleGame {
                     x >= HAND_LEFT && x <= HAND_LEFT + NUM_HAND * CARD_SPACING) {
                 this.selectedPos = (int) ((x - HAND_LEFT) / CARD_SPACING);
                 UI.clearText();
-                UI.println("selected " + this.selectedPos);
+               // UI.println("selected " + this.selectedPos);
                 this.redraw();
             }
         }
